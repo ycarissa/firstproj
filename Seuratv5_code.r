@@ -2,6 +2,7 @@ library(Seurat)
 library(ggplot2)
 library(glmGamPoi)
 library(dplyr)
+library(patchwork)
 
 #### Single Cell RNAseq Analysis based on the GEO database dataset GSE282630 ####
 ## Comparison of WT to NOTCH2 gain-of-function mice ##
@@ -76,3 +77,33 @@ u2 <- DimPlot(combined.s, reduction = "umap", label = TRUE, group.by = "orig.ide
 ggsave(filename = file.path(save_dir, "UMAP_by_Clusters.png"), plot = u1, width = 8, height = 6, dpi=600)
 ggsave(filename = file.path(save_dir, "UMAP_by_Identity.png"), plot = u2, width = 8, height = 6, dpi=600)
 
+### Cell Type Labeling
+Idents(combined.s) <- "seurat_clusters"
+combined.s <- PrepSCTFindMarkers(combined.s)
+
+marker_dir <- paste0(save_dir, "/Marker_Genes")
+dir.create(marker_dir)
+
+clusters <- levels(combined.s)
+
+### Loop to 1. find marker genes per cluster and 2. make vlnplots for the top 5 genes in each
+for (cluster in clusters) {
+  markers <- FindMarkers(combined.s, 
+                                ident.1 = cluster,
+                                only.pos = TRUE, 
+                                min.pct = 0.25,            
+                                logfc.threshold = 0.25,
+                                assay = "SCT")
+  
+  write.csv(markers, file = paste0(marker_dir, "/cluster_", cluster, "_markers.csv"), row.names = TRUE)
+  
+  ###Violin plots of the top 5 genes of each cluster
+  top5_genes <- head(rownames(markers), 5)
+  vln_plots <- lapply(top5_genes, function(gene) {
+    VlnPlot(combined.s, features = gene, pt.size = 0) +
+      labs(title = gene, x = "Identity", y = "Expression Level") + theme(legend.position = "none")
+  })
+  
+  all_5_plots <- wrap_plots(vln_plots, ncol = 1)
+  ggsave(filename = paste0(marker_dir, "/cluster_", cluster, "_VlnPlot.png"), plot = all_5_plots, width = 6, height = 10, dpi = 600)
+}
