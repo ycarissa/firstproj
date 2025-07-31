@@ -107,3 +107,45 @@ for (cluster in clusters) {
   all_5_plots <- wrap_plots(vln_plots, ncol = 1)
   ggsave(filename = paste0(marker_dir, "/cluster_", cluster, "_VlnPlot.png"), plot = all_5_plots, width = 6, height = 10, dpi = 600)
 }
+
+### Cell type labeling was performed using PanglaoDB and literature as reference.
+
+### Assigning cell types to seurat clusters
+Idents(combined.s) <- "seurat_clusters"
+
+cell_type_naming <- c(
+  "0" = "Mature Chondrocytes",
+  "1" = "Fibroblasts",
+  "2" = "Limb Mesenchyme",
+  "3" = "Fibroblasts", 
+  "4" = "Early Chondrocytes",
+  "5" = "Early Pregenitor Chondrocytes",
+  "6" = "Myofibroblasts",
+  "7" = "Fibrochondrocytes",
+  "8" = "Osteogenic Chondrocytes",
+  "9" = "Mitotic Chondrocytes",
+  "10" = "Macrophages",
+  "11" = "Hypertrophic Chondrocytes")
+
+combined.s <- RenameIdents(combined.s, cell_type_naming)
+combined.s$cell_type <- Idents(combined.s)
+
+### Remaking plots from the original paper
+#1 UMAP of cell types
+u3 <- DimPlot(combined.s, reduction = "umap", label = TRUE, group.by = "cell_type") + ggtitle("UMAP with Labeled Cell Types")
+ggsave(filename = file.path(save_dir, "/UMAP_by_Cell_Type.png"), plot = u3, width = 8, height = 6, dpi=600)
+
+#2 Bar graph displaying number of cells per cell type
+cell_counts <- combined.s@meta.data %>%
+  group_by(orig.ident, cell_type) %>%
+  summarise(n = n(), .groups = "drop")
+
+b1 <- ggplot(cell_counts, aes(x = orig.ident, y = n, fill = cell_type)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Condition", y = "Number of Cells", fill = "Cell Type") +
+  theme_minimal()
+
+ggsave(filename = file.path(save_dir, "/stacked_celltype_barplot.png"), plot = b1, width = 6, height = 5, dpi = 600)
+
+
+
