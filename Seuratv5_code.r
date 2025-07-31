@@ -56,10 +56,10 @@ WT_subset.s <- subset(WT.s, subset = nFeature_RNA > 250 & nFeature_RNA < 10000 &
 combined.s <- merge(x = Het_subset.s, y = WT_subset.s, project = "combined", add.cell.ids = c("Het", "WT"))
 Idents(combined.s) <- "orig.ident"
 
-combined.s <- SCTransform(combined.s, vars.to.regress = "percent.mt", verbose = FALSE)
+combined.s <- SCTransform(combined.s, vars.to.regress = "percent.mt", assay = "RNA")
+
 combined.s <- RunPCA(combined.s, assay = "SCT", verbose = FALSE)
 ElbowPlot(combined.s) ### 1:10 was chosen
-
 
 combined.s <- IntegrateLayers(object = combined.s, method = CCAIntegration, assay = "SCT", normalization.method = "SCT", orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
 
@@ -108,7 +108,7 @@ for (cluster in clusters) {
   ggsave(filename = paste0(marker_dir, "/cluster_", cluster, "_VlnPlot.png"), plot = all_5_plots, width = 6, height = 10, dpi = 600)
 }
 
-### Cell type labeling was performed using PanglaoDB and literature as reference.
+### Cell type labeling was performed using PanglaoDB and literature as reference. ###
 
 ### Assigning cell types to seurat clusters
 Idents(combined.s) <- "seurat_clusters"
@@ -147,5 +147,28 @@ b1 <- ggplot(cell_counts, aes(x = orig.ident, y = n, fill = cell_type)) +
 
 ggsave(filename = file.path(save_dir, "/stacked_celltype_barplot.png"), plot = b1, width = 6, height = 5, dpi = 600)
 
+### Differential Expression Analysis  ###
+Idents(combined.s) <- "cell_type"
+cell_type <- levels(combined.s) 
+de_dir <- paste0(save_dir, "/DGE_Analysis")
+dir.create(de_dir)
 
+combined.s <- PrepSCTFindMarkers(combined.s, assay = "SCT")
+for (cell in cell_type) {
+  celltype_subset <- subset(combined.s, idents = cell)
+  
+  de_results <- FindMarkers(celltype_subset,
+                            ident.1 = "WT",
+                            ident.2 = "Het",
+                            group.by = "orig.ident",  
+                            assay = "SCT",
+                            logfc.threshold = 0.25,
+                            min.pct = 0.1,
+                            only.pos = FALSE,
+                            recorrect_umi = FALSE)
+
+  if (nrow(de_results) > 0) {
+    write.csv(de_results, file = file.path(de_dir, paste0("DE_", gsub(" ", "_", cell), "_WT_vs_Het.csv")))
+  }
+}
 
