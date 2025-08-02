@@ -210,7 +210,7 @@ fibro_sig_genes$entrez_id <- mapIds(org.Mm.eg.db,
 
 
 ## Running GO Enrichment on all 3 gene lists (Total, up, down) and ont (BP, MF, CC) based on gene_list (complete list of significant DEGs)
-#Assumes that no list comes out to 0 genes
+
 run_go <- function(gene_list) {
   
   onts <- c("BP", "CC", "MF")
@@ -224,14 +224,14 @@ run_go <- function(gene_list) {
    }
   
     #Total
-    ego <- enrichGO(gene  = gene_list$entrez_id,
-           OrgDb        = org.Mm.eg.db,
-           keyType      = "ENTREZID",
-           ont          = ont,
-           pAdjustMethod= "BH",
+    ego <- enrichGO(gene = gene_list$entrez_id,
+           OrgDb = org.Mm.eg.db,
+           keyType = "ENTREZID",
+           ont = ont,
+           pAdjustMethod = "BH",
            pvalueCutoff = 0.05,
            qvalueCutoff = 0.2,
-           readable     = TRUE)
+           readable = TRUE)
   
     if (!is.null(ego) && nrow(ego@result) > 0) {
   
@@ -244,14 +244,14 @@ run_go <- function(gene_list) {
     genes_down <- gene_list$entrez_id[gene_list$avg_log2FC < 0]
   
     #Up 
-    up <- enrichGO(gene  = genes_up,
-                    OrgDb        = org.Mm.eg.db,
-                    keyType      = "ENTREZID",
-                    ont          = ont,
-                    pAdjustMethod= "BH",
+    up <- enrichGO(gene = genes_up,
+                   OrgDb = org.Mm.eg.db,
+                   keyType = "ENTREZID",
+                   ont = ont,
+                   pAdjustMethod = "BH",
                    pvalueCutoff = 0.05,
-                    qvalueCutoff = 0.2,
-                  readable     = TRUE)
+                   qvalueCutoff = 0.2,
+                   readable = TRUE)
     
     if (!is.null(up) && nrow(up@result) > 0) {
     d3 <- dotplot(up, showCategory=10) + ggtitle(paste("Upregulated GO Enrichment -", ont))
@@ -260,14 +260,14 @@ run_go <- function(gene_list) {
     }
   
     #Down
-    down <- enrichGO(gene  = genes_down,
-                 OrgDb        = org.Mm.eg.db,
-                 keyType      = "ENTREZID",
-                 ont          = ont,
-                 pAdjustMethod= "BH",
-                 pvalueCutoff = 0.05,
-                 qvalueCutoff = 0.2,
-                 readable     = TRUE)
+    down <- enrichGO(gene = genes_down,
+                     OrgDb = org.Mm.eg.db,
+                     keyType = "ENTREZID",
+                     ont = ont,
+                     pAdjustMethod = "BH",
+                     pvalueCutoff = 0.05,
+                     qvalueCutoff = 0.2,
+                     readable = TRUE)
   
     if (!is.null(down) && nrow(down@result) > 0) {
     d3 <- dotplot(down, showCategory=10) + ggtitle(paste("Downregulated GO Enrichment -", ont))
@@ -291,9 +291,9 @@ run_kegg <- function(gene_list) {
   }
   
   #Total
-  kegg <- enrichKEGG(gene         = gene_list$entrez_id,
-                           organism     = 'mmu',            
-                           keyType      = "kegg",           
+  kegg <- enrichKEGG(gene = gene_list$entrez_id,
+                           organism = 'mmu',            
+                           keyType = "kegg",           
                            pAdjustMethod= "BH",
                            pvalueCutoff = 0.05,
                            qvalueCutoff = 0.2)
@@ -310,10 +310,10 @@ run_kegg <- function(gene_list) {
   genes_down <- gene_list$entrez_id[gene_list$avg_log2FC < 0]
   
   #Up
-  kegg_up <- enrichKEGG(gene         = genes_up,
-                          organism     = 'mmu',
-                          keyType      = "kegg",
-                          pAdjustMethod= "BH",
+  kegg_up <- enrichKEGG(gene = genes_up,
+                          organism = 'mmu',
+                          keyType = "kegg",
+                          pAdjustMethod = "BH",
                           pvalueCutoff = 0.05,
                           qvalueCutoff = 0.2)
   if (!is.null(kegg_up) && nrow(kegg_up@result) > 0) {
@@ -326,10 +326,10 @@ run_kegg <- function(gene_list) {
   
   
   #Down
-    kegg_down <- enrichKEGG(gene         = genes_down,
-                            organism     = 'mmu',
-                            keyType      = "kegg",
-                            pAdjustMethod= "BH",
+    kegg_down <- enrichKEGG(gene = genes_down,
+                            organism = 'mmu',
+                            keyType = "kegg",
+                            pAdjustMethod = "BH",
                             pvalueCutoff = 0.05,
                             qvalueCutoff = 0.2)
     if (!is.null(kegg_down) && nrow(kegg_down@result) > 0) {
