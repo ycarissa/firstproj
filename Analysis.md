@@ -265,9 +265,9 @@ the fibroblasts would be using dot plots:
 
 ``` r
 d1 <- DotPlot(fibro_only, features = rownames(fibro_top_genes), group.by = "orig.ident") +
-  labs(title = "DEGs Fibroblast only")
+  labs(title = "DEGs Fibroblast only") +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 d2 <- DotPlot(combined.s, features = rownames(fibro_top_genes), group.by = "orig.ident") +
-  labs(title = "DEGs Combined")
+  labs(title = "DEGs Combined") +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ![](Analysis_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->![](Analysis_files/figure-gfm/unnamed-chunk-25-2.png)<!-- -->
