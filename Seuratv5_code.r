@@ -170,11 +170,9 @@ for (cell in cell_type) {
                             min.pct = 0.1,
                             only.pos = FALSE,
                             recorrect_umi = FALSE)
-
-  current_cluster <- paste0("DE_", gsub(" ", "_", cell), "_WT_vs_Het")
-  assign(current_cluster, de_results)
-  
-  if (nrow(de_results) > 0) {
+    current_cluster <- paste0("DE_", gsub(" ", "_", cell), "_WT_vs_Het")
+    assign(current_cluster, de_results)
+    if (nrow(de_results) > 0) {
     write.csv(de_results, file = file.path(de_dir, paste0("DE_", gsub(" ", "_", cell), "_WT_vs_Het.csv")))
   }
 }
