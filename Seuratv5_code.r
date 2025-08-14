@@ -343,3 +343,10 @@ run_kegg <- function(gene_list) {
 ##################################
 
 run_kegg(fibro_sig_genes)
+
+kegg <- enrichKEGG(gene = fibro_sig_genes$entrez_id,
+                                            organism = 'mmu',            
+                                            keyType = "kegg",           
+                                            pAdjustMethod= "BH",
+                                            pvalueCutoff = 0.05,
+                                            qvalueCutoff = 0.2)

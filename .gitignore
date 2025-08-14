@@ -54,12 +54,6 @@ rsconnect/
 /*_files/
 
 
-### Data Output files
-*.png
-*.pdf
-*.jpeg
-*.svg
-
 /Seuratv5_Analysis/
 /Het_NOTCH/
 /WT_NOTCH/
